@@ -1,36 +1,26 @@
-- name: install httpd/php (CentOS)
-  tags: centos,apache,httpd
+- name: install web server packages
+  tags: apache,httpd,php
   package:
     name:
-      - httpd
-      - php
+      - "{{ apache_package_name }}"
+      - "{{ php_package_name }}"
     state: latest
-  when: ansible_distribution == "CentOS"
 
-- name: start and enable httpd (CentOS)
-  tags: centos,apache,httpd
+- name: start and enable apache service
+  tags: apache,httpd
   service:
-    name: httpd
+    name: "{{ apache_service }}"
     state: started
     enabled: yes
-  when: ansible_distribution == "CentOS"
-
-- name: intsall apache2 (Ubuntu)
-  tags: ubuntu,apache,apache2
-  package:
-    name:
-      - apache2
-      - libapache2-mod-php
-    state: latest
-  when: ansible_distribution == "Ubuntu"
 
 - name: change e-mail address for admin
   tags: centos,apache,httpd
   lineinfile:
     path: /etc/httpd/conf/httpd.conf
     regexp: '^ServerAdmin'
-    line: ServerAdmin sombody@somwhere.net
+    line: ServerAdmin nobody@somwhere.net
   when: ansible_distribution == "CentOS"
+  notify: restart_apache
 
 - name: copy html file for site
   tags: apache,apache2,httpd
