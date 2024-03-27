@@ -1,0 +1,9 @@
+- name: add ssh ansible key for TheCat
+  authorized_key: 
+    user: TheCat
+    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP5ApDuMUK/BpHWcYRjNoe0eSi+nMuDQ7f9MAe/FIbur ansible"
+
+- name: add ssh default key for TheCat
+  authorized_key:
+    user: TheCat
+    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDAF7Iw8cCHSDMFuTG7H/+MqE8WkkrzorQQsay1G3M3G default"

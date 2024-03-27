@@ -18,96 +18,27 @@
       changed_when: false
       when: ansible_distribution == "Ubuntu"
 
+- hosts: all
+  become: true
+  roles:
+    - base
+
 - hosts: workstations
   become: true
-  tasks:
-
-    - name: install unzip
-      package:
-        name: unzip
-
-    - name: install terrafrom
-      unarchive:
-        src: https://releases.hashicorp.com/terraform/1.7.5/terraform_1.7.5_linux_amd64.zip
-        dest: /usr/local/bin
-        remote_src: yes
-        mode: 0755
-        owner: root
-        group: root
-
+  roles:
+    - workstations
 
 - hosts: web_servers
   become: true
-  tasks:
-
-    - name: install apache/php and update repo index for ubuntu servers
-      tags: apache,apache2,ubuntu
-      package:
-        name:
-          - apache2
-          - libapache2-mod-php
-        state: latest
-      when: ansible_distribution == "Ubuntu"
-
-    - name: install apache/php and update repo index for centos
-      tags: apache,centos,httpd
-      package:
-        name:
-          - httpd
-          - php
-        state: latest
-      when: ansible_distribution == "CentOS"
-
-    - name: start httpd (CentOS)
-      tags: apache,apache2,httpd
-      service:
-        name: httpd
-        state: started
-        enabled: yes
-      when: ansible_distribution == "CentOS"
-
-    - name: change e-mail address for admin
-      tags: apache,centos,httpd
-      lineinfile:
-        path: /etc/httpd/conf/httpd.conf
-        regexp: '^ServerAdmin'
-        line: ServerAdmin sombody@nowhere.net
-      when: ansible_distribution == "CentOS"
-      register: httpd
-
-    - name: restart httpd (CentOS)
-      tags: apache,apache2,httpd
-      service:
-        name: httpd
-        state: restarted
-      when: httpd.changed
-
-
-    - name: copy default html file for site
-      tags: apache,apache2,httpd
-      copy:
-        src: default_site.html
-        dest: /var/www/html/index.html
-        owner: root
-        group: root
-        mode: 0644
+  roles:
+    - web_servers
 
 - hosts: db_servers
   become: true
-  tasks:
-    - name: install mariadb package (Ubuntu)
-      tags: ubuntu,mariadb,db
-      package:
-        name: mariadb-server
-        state: latest
-      when: ansible_distribution == "Ubuntu"
+  roles:
+    - db_servers
 
 - hosts: file_servers
   become: true
-  tasks:
-    - name: install samba package
-      tags: samba
-      package:
-        name: samba
-        state: latest
-
+  roles:
+    - file_servers
