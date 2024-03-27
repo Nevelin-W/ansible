@@ -1,0 +1,50 @@
+---
+
+- hosts: all
+  become: true
+  pre_tasks:
+
+    - name: install updates (CentOS)
+      tags: always
+      package:
+        update_only: yes
+        update_cache: yes
+      when: ansible_distribution == "CentOS"
+
+    - name: install updates (Ubuntu)
+      tags: always
+      package:
+        upgrade: dist
+        update_cache: yes
+      when: ansible_distribution == "Ubuntu"
+
+- hosts: all
+  become: true
+  tasks:
+    - name: create cat user
+      tags: always
+      user:
+        name: TheCat
+        group: root
+
+    - name: add ssh ansible key for TheCat
+      tags: always
+      authorized_key:
+        user: TheCat
+        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP5ApDuMUK/BpHWcYRjNoe0eSi+nMuDQ7f9MAe/FIbur ansible"
+
+    - name: add ssh default key for TheCat
+      tags: always
+      authorized_key:
+        user: TheCat
+        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDAF7Iw8cCHSDMFuTG7H/+MqE8WkkrzorQQsay1G3M3G default"
+
+    - name: ad sudoers file for TheCat
+      tags: always
+      copy:
+        src: sudoer_TheCat
+        dest: /etc/sudoers.d/TheCat
+        owner: root
+        group: root
+        mode: 0440
+
